@@ -6,3 +6,4 @@ scikit-learn
 streamlit
 Pillow
 h5py==3.8.0
+pip install tensorflow numpy pillow streamlit
