@@ -70,26 +70,26 @@ def train_and_save_model():
         width_shift_range=0.1,
         height_shift_range=0.1,
         horizontal_flip=True,
-        fill_mode="nearest" [cite: 2]
+        fill_mode="nearest" 
     )
-    valAug = ImageDataGenerator() # No augmentation for validation [cite: 2]
+    valAug = ImageDataGenerator() # No augmentation for validation 
 
-    # --- Stage 1: Feature Extraction (Training Head) [cite: 2] ---
+    # --- Stage 1: Feature Extraction (Training Head)  ---
     with st.spinner("Stage 1/2: Training Classification Head..."):
-        # Load VGG-16 Base Model [cite: 2]
+        # Load VGG-16 Base Model 
         baseModel = VGG16(
             weights="imagenet",
             include_top=False, 
             input_tensor=tf.keras.layers.Input(shape=(IMG_SIZE[0], IMG_SIZE[1], 3))
         )
-        baseModel.trainable = False # Freeze base layers [cite: 2]
+        baseModel.trainable = False # Freeze base layers 
         
         # Build and Compile Model
-        model = build_head_model(baseModel) [cite: 3]
+        model = build_head_model(baseModel) 
         opt = Adam(learning_rate=INIT_LR)
-        model.compile(loss="binary_crossentropy", optimizer=opt, metrics=["accuracy"]) [cite: 2]
+        model.compile(loss="binary_crossentropy", optimizer=opt, metrics=["accuracy"]) 
 
-        # Train Stage 1 [cite: 2]
+        # Train Stage 1 
         H = model.fit(
             trainAug.flow(trainX, trainY, batch_size=BS),
             steps_per_epoch=len(trainX) // BS,
@@ -99,22 +99,22 @@ def train_and_save_model():
         )
         st.success(f"Stage 1 Complete. Accuracy: {H.history['val_accuracy'][-1]:.4f}")
 
-    # --- Stage 2: Fine-Tuning Top Layers [cite: 4] ---
+    # --- Stage 2: Fine-Tuning Top Layers  ---
     with st.spinner("Stage 2/2: Fine-Tuning Top VGG Blocks..."):
-        baseModel.trainable = True # Unfreeze the entire VGG-16 base model [cite: 4]
+        baseModel.trainable = True # Unfreeze the entire VGG-16 base model 
 
-        # Freeze Block 1, 2, and 3 [cite: 4]
+        # Freeze Block 1, 2, and 3 
         for layer in baseModel.layers:
             if layer.name.startswith("block1") or layer.name.startswith("block2") or layer.name.startswith("block3"):
                 layer.trainable = False
             else:
                 layer.trainable = True
 
-        # Re-compile with lower LR [cite: 5]
-        opt = Adam(learning_rate=FINETUNE_LR) [cite: 5]
-        model.compile(loss="binary_crossentropy", optimizer=opt, metrics=["accuracy"]) [cite: 5]
+        # Re-compile with lower LR 
+        opt = Adam(learning_rate=FINETUNE_LR) 
+        model.compile(loss="binary_crossentropy", optimizer=opt, metrics=["accuracy"]) 
 
-        # Train Stage 2 [cite: 5]
+        # Train Stage 2 
         H_finetune = model.fit(
             trainAug.flow(trainX, trainY, batch_size=BS),
             steps_per_epoch=len(trainX) // BS,
@@ -125,7 +125,7 @@ def train_and_save_model():
         )
         st.success(f"Stage 2 Complete. Final Validation Accuracy: {H_finetune.history['val_accuracy'][-1]:.4f}")
 
-    # --- Save Model [cite: 6] ---
+    # --- Save Model  ---
     model.save(MODEL_PATH) 
     st.balloons()
     st.success(f"Training Complete! Model saved as '{MODEL_PATH}'")
