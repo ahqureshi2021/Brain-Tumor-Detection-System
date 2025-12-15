@@ -1,0 +1,8 @@
+tensorflow==2.20.0
+keras
+numpy==1.26.4
+opencv-python-headless
+scikit-learn
+streamlit
+Pillow
+h5py==3.8.0
