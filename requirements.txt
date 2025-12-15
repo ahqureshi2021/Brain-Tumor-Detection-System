@@ -1,8 +1,8 @@
-tensorflow==2.20.0
+tensorflow
 keras
-numpy==1.26.4
+numpy
 opencv-python-headless
 scikit-learn
 streamlit
 Pillow
-h5py==3.8.0
+h5py
